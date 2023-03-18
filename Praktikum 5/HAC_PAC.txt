@@ -1,0 +1,166 @@
+//*******************************************************************************//
+//HAC
+
+import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
+from sklearn.cluster import AgglomerativeClustering
+import scipy.cluster.hierarchy as sch #Import HAC
+//
+from sklearn.datasets import load_iris
+iris = load_iris()
+features = iris.data.T
+plt.plot()
+plt.scatter(features[0], features[1])#Sepal Length dan Sepal Width
+plt.show()
+//
+X = np.array(list(zip(features[0], features[1]))).reshape(len(features[1]),2)
+dendrogram = sch.dendrogram(sch.linkage(X, method='average'))
+#dendrogram dg methode rata2 atau average
+//
+#n_cluster bisa inisialisasi sendiri atau menggunakan elbow method seperti praktikum sebelumnya
+#dari praktikum sebelumnya n_cluster yang terbaik untuk data iris feature 0 dan 1 adalah 3
+model = AgglomerativeClustering(n_clusters=3, affinity='euclidean', linkage='average')#Labelin dulu n = 3, Cari Jaraknya dengan Average
+model.fit(X)
+labels = model.labels_
+//
+labels
+//
+plt.scatter(X[labels==0, 0], X[labels==0, 1], s=50, marker='o', color='red')
+plt.scatter(X[labels==1, 0], X[labels==1, 1], s=50, marker='o', color='blue')
+plt.scatter(X[labels==2, 0], X[labels==2, 1], s=50, marker='o', color='green')
+plt.scatter(X[labels==3, 0], X[labels==3, 1], s=50, marker='o', color='purple')
+plt.scatter(X[labels==4, 0], X[labels==4, 1], s=50, marker='o', color='orange')
+plt.show()
+//
+model = AgglomerativeClustering(n_clusters=3, affinity='euclidean', linkage='single')
+model.fit(X)
+labels = model.labels_
+plt.scatter(X[labels==0, 0], X[labels==0, 1], s=50, marker='o', color='red')
+plt.scatter(X[labels==1, 0], X[labels==1, 1], s=50, marker='o', color='blue')
+plt.scatter(X[labels==2, 0], X[labels==2, 1], s=50, marker='o', color='green')
+plt.scatter(X[labels==3, 0], X[labels==3, 1], s=50, marker='o', color='purple')
+plt.scatter(X[labels==4, 0], X[labels==4, 1], s=50, marker='o', color='orange')
+plt.show()
+//
+model = AgglomerativeClustering(n_clusters=3, affinity='euclidean', linkage='complete')
+model.fit(X)
+labels = model.labels_
+plt.scatter(X[labels==0, 0], X[labels==0, 1], s=50, marker='o', color='red')
+plt.scatter(X[labels==1, 0], X[labels==1, 1], s=50, marker='o', color='blue')
+plt.scatter(X[labels==2, 0], X[labels==2, 1], s=50, marker='o', color='green')
+plt.scatter(X[labels==3, 0], X[labels==3, 1], s=50, marker='o', color='purple')
+plt.scatter(X[labels==4, 0], X[labels==4, 1], s=50, marker='o', color='orange')
+plt.show()
+//
+model = AgglomerativeClustering(n_clusters=3, affinity='euclidean', linkage='ward')
+model.fit(X)
+labels = model.labels_
+plt.scatter(X[labels==0, 0], X[labels==0, 1], s=50, marker='o', color='red')
+plt.scatter(X[labels==1, 0], X[labels==1, 1], s=50, marker='o', color='blue')
+plt.scatter(X[labels==2, 0], X[labels==2, 1], s=50, marker='o', color='green')
+plt.scatter(X[labels==3, 0], X[labels==3, 1], s=50, marker='o', color='purple')
+plt.scatter(X[labels==4, 0], X[labels==4, 1], s=50, marker='o', color='orange')
+plt.show()
+//
+//*******************************************************************************//
+//PAC
+#import pandas
+import pandas as pd
+url = "http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
+#Load dataset into Pandas dataFrame
+df = pd.read_csv(url, names=['sepal length', 'sepal width', 'petal length', 'petal width', 'target'])
+//
+from sklearn.preprocessing import StandardScaler# normalisasi biar jarak antar datanya sama
+features = ['sepal length', 'sepal width', 'petal length', 'petal width']
+#Separating our the features
+x = df.loc[:, features].values
+#Separating out the target
+y = df.loc[:, ["target"]].values
+#Strandarizing the features
+X=StandardScaler().fit_transform(x)
+//
+from sklearn.decomposition import PCA
+pca = PCA(n_components=2)
+principalComponents = pca.fit_transform(x)
+principalDf = pd.DataFrame(data = principalComponents, columns = ['principal component 1', 'principal component 2'])
+//
+finalDf = pd.concat([principalDf, df[['target']]], axis = 1)
+//
+import matplotlib.pyplot as plt
+fig = plt.figure(figsize = (8,8))
+ax = fig.add_subplot(1,1,1)
+ax.set_xlabel('Principal Component 1', fontsize = 15)
+ax.set_ylabel('Principal Component 2', fontsize = 15)
+ax.set_title('2 Component PCA', fontsize = 20)
+targets = ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica']
+colors = ['r', 'g', 'b']
+for targets, color in zip(targets, colors):
+    indicesToKeep = finalDf['target'] == targets
+    ax.scatter(finalDf.loc[indicesToKeep, 'principal component 1'],
+              finalDf.loc[indicesToKeep, 'principal component 2'],
+              c = color,
+              s = 50)
+ax.legend(targets)
+ax.grid()
+//
+pca.explained_variance_ratio_
+//
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from sklearn.decomposition import PCA
+//
+iris = datasets.load_iris()
+//
+df = pd.DataFrame(data = np.c_[iris['data'], iris['target']], columns = iris['feature_names'] + ['target'])
+//
+df.head()
+//
+model = PCA()
+//
+model.fit(df.iloc[:, 0:4])
+//
+mean = model.mean_
+mean
+//
+first_pc = model.components_[0, :]
+first_pc
+//
+transformed = model.transform(df.iloc[:,0:4])
+//
+print(transformed)
+//
+plt.scatter(df.iloc[:,0], df.iloc[:,1], c = df.iloc[:,-1])
+plt.arrow(mean[0], mean[1], first_pc[0], first_pc[1], color = 'red', width=0.05)
+plt.axis('equal')
+plt.show()
+//
+features = range(model.n_components_)
+features
+//
+plt.bar(features, model.explained_variance_)
+plt.xticks(features)
+plt.ylabel('variance')
+plt.xlabel('PCA features')
+plt.show()
+//
+#Create a PCA mdoel with 2 components : PCA
+pca = PCA(n_components = 2)
+#Fit the PCA intance to the scaled sample
+pca.fit(df.iloc[:,0:4])
+#Transform the scaled samples : pca_features
+pca_features = pca.transform(df.iloc[:,0:4])
+#Print the shape of pca_features
+print(pca_features.shape)
+//
+xs = pca_features[:,0]
+ys = pca_features[:,1]
+plt.scatter(xs,ys, c = df.iloc[:,-1])
+plt.show()
+
+
+
+
+
